@@ -1,0 +1,71 @@
+version 4.2
+- Added horizontal scrolling when displayed inline
+- Bug fixes
+
+version 4.1
+- Improved security to prevent Directory Traversal Attacks (as pointed out by Muhan Luo in comments )
+- Added pagination to full view
+- Display gallery and albums in the scroller or in full page independantly of each other, ie. display the gallery in the scroller but albums in full page view.   
+- Added sorting by reverse file name 
+
+version 4.0
+- Added responsive view
+- Modified settings in config file
+- Removed some settings from config.php file, it is now easier to change thumbnail width/height from css file
+- Now, all thumbnails can be displayed in a page or in the scroller 
+- Added share album link on the image overlay modal
+- Redesigned image overlay modal
+- Local mp3 and mp4 files now use native html5 player in the image overlay modal
+- Improved the scroller
+- Other minor changes 
+- Bug Fixes
+
+version 3.5
+- Added option to specify max width of canvas
+- Added option to specify max number of rows to display in canvas
+- Added option to specify thumbnail height
+- Added option to specify width of thumbnails when being created 
+- Added html5media (html5media.info) support. Gallery can play mp3 and mp4 files now in the image overlay
+- Changed tooltip in album caption to be mobile friendly
+- Revamped the image overlay look
+- Added Google Material Design icons
+- Bug fixes  
+
+version 3.0
+- Added native responsive image viewer overlay
+- Colorbox no longer required
+- Added exif info in image view
+- Added prev/next slider to Thumbnail view. Pagination blocks no longer required.
+- Made other minor modifications
+- Made the thumbnail/image viewer responsive
+
+version 2.0
+- Added ability to embed videos from youtube and vimeo
+- Added ability to add descriptions to albums and images from a text file
+- Modified underlying code to accommodate the above changes
+
+version 1.4
+- Security fixes
+- minor CSS changes
+
+version 1.3
+- Added option to display random or static album thumbnails
+- Modified thumbnail resizing function. Now it resizes images only if they are wider than specified
+- Renamed some php variables in code
+- Sort by name is not case sensitive now
+- Cleaned up code and fixed some other bugs
+- Changed appearance of pagination   
+- Made other minor modifications
+
+version 1.2
+- Renamed the gallery to folioGallery
+- Added option for displaying captions in album files
+- Added png and gif automatic thumbnail creation
+- Changed thumbnail styling
+- Modified the CSS 
+- Made other minor modifications
+
+Version 1.1
+- Correct number of images are now displayed in colorbox modal window.
+- Correct number of images are now looped in colorbox modal window. 
+- Made minor changes to php file.

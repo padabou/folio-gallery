@@ -1,0 +1,9 @@
+album;The album above contains videos from Youtube and Vimeo, as well as local mp4 and mp3 files. Description for this album is located in the descriptions.txt file inside the album's folder. You may create this text file manually and add it to the album's folder. To use your own thumnbnails for videos, simply add a jpg file to the album's "thumbs" folder and name it same as the main file.;
+Sample_Video.mp4;This is a local mp4 file. The video player is the builtin HTML5 player;
+blues.mp3;This is a local mp3 file. The audio player is the builtin HTML5 player;
+utube-sBmlLKzMA_s.jpg;This is a sample youtube video. Description added from text file located in this album's folder;
+vimeo-50522981.jpg;This is a video from Vimeo;
+utube-cDNDVtoJhik.jpg;Mohsen Yeganeh - Behet Ghol Midam ( I promise you );
+utube-k9kBLNsOX7U.jpg;Cheap Thrills - Sia by Ahmed Alshaiba;
+utube-4jf75E4dTDY.jpg;Yanni - For All Seasons;
+utube-yWSXjKFdoEQ.jpg;My Dark Place / The Secret Trio (Ara Dinkjian, Tamer Pinarbasi & Ismail Lumanovski);
