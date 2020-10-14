@@ -1,13 +1,7 @@
-/*!
-	folioGallery v4.1 - 2019-05-27
-	(c) 2019 Harry Ghazanian - foliopages.com/php-jquery-ajax-photo-gallery-no-database
-	This content is released under the http://www.opensource.org/licenses/mit-license.php MIT License.
-*/
-
-var folioGalleryDir = './'; // foliogallery folder relative path - absolute path like http://my_website.com/foliogallery may not work
+var folioGalleryDir = './foliogallery'; // foliogallery folder relative path - absolute path like http://my_website.com/foliogallery may not work
 
 $(function() {					   
-			
+						
 	// get parameters for share url
 	var sharealb = getUrlParameter('alb'),
 		shareimg = getUrlParameter('img');	
@@ -22,7 +16,7 @@ $(function() {
 		$.ajax
 		({
 			type: 'POST',
-			url: 'foliogallery-img.php',
+			url: folioGalleryDir+'/foliogallery-img.php',
 			data: {
 				albumpage: albumpage,
 				alb: sharealb,
@@ -57,7 +51,8 @@ $(function() {
 			album,
 			albumpage,
 			thumb,
-			image;
+			image,
+			root;
 		
 		this == value; //true
 		targetId = this.id; // id of div to load albums
@@ -75,13 +70,13 @@ $(function() {
 		
 		// in gallery view, load album when thumb is clicked
 		$(this).on('click', 'a.showAlb', function() {	
-			var showAlb = $(this).prop('rel');
+			var showAlb = $(this).prop('title');
 			loadGallery(folioGalleryDir,targetId,showAlb,fullAlbum,1);
 			return false;
 		});
 								
 		// refresh div content
-		$(this).on('click', 'a.refresh', function() {
+		$(this).on('click', 'a.fgrefresh', function() {
 		   loadGallery(folioGalleryDir,targetId,'',fullAlbum,1);
 		   return false;
 		});
@@ -135,18 +130,20 @@ $(function() {
 		$('#tooltipDiv').hide(); // close tooltip when arrows clicked
 		$('.fgmainspinner').show();
 								
-		album = $(this).prop('rel');
-		image = $(this).prop('rev');
+		album = $(this).data('album'); // only name/dir of album
+		image = $(this).data('file');
+		root = $(this).data('root');
 		albumpage = document.location.href;
-		
+
 		$.ajax
 		({
 			type: 'POST',
-			url: 'foliogallery-img.php',
+			url: folioGalleryDir+'/foliogallery-img.php',
 			data: {
 				albumpage: albumpage,
 				alb: album,
-				img: image
+				img: image,
+				root: root
 			},
 			cache: false,
 			success: function(dat)
@@ -155,6 +152,11 @@ $(function() {
 					$('#fgOverlay').html(dat).show();
 					$('.fgmainspinner').hide();
 				}, 300);
+			},
+			error: function(jqXHR, textStatus, errorThrown)
+			{
+				alert("Error: jqXHR " + JSON.stringify(jqXHR) + " - textStatus " + JSON.stringify(textStatus) + " - errorThrown " + JSON.stringify(errorThrown));				
+				console.log($(jqXHR.responseText));
 			}
 		});
 		
@@ -171,17 +173,43 @@ $(function() {
 		$('#tooltipDiv').hide();
 		return false;
 	});
+	
+	// show/hide info pane in image overlay
+	$(this).on('click', '.icon-drawer', function(e) {	
+		e.preventDefault();
+				
+		$('#leftCol').removeClass('leftColFW');
+		
+		// save status of infobox in localStorage
+		if($('#infoBox').is(':hidden'))
+		{
+			localStorage.setItem('infobox', 0);
+			$('#leftCol').removeClass('leftColToggle');
+			$('#infoBox').removeClass('infoBoxToggle');
+			
+		}
+		else
+		{
+			localStorage.setItem('infobox', 1);
+			$('#leftCol').addClass('leftColToggle');
+			$('#infoBox').addClass('infoBoxToggle');
+		}
+				
+	});
 			
 	// tooltip
 	$(this).on('click', '.tooltip', function(e) {	
 		e.preventDefault();
 		var tooltipId = 'tooltipDiv',
-			rev = $(this).attr('rev'),
-			content = "<div id='"+ tooltipId +"'><span id='tooltipClose'></span><span class='label-txt'>Share URL:</span><br> "+ rev +"</div>";
-				
+			tooltipData = $(this).data('text'),
+			content = "<div id='"+ tooltipId +"'><span id='tooltipClose'></span><span class='label-txt'>Share URL:</span><br><textarea>"+ tooltipData +"</textarea>URL copied to clipboard</div>";
+
 		if (content != ''){		
 			$('body').prepend(content);								
-			$('#'+tooltipId).show();	
+			$('#'+tooltipId).show();
+
+			$('#'+tooltipId+' textarea').select();
+			document.execCommand('copy');
 		}
 	});	
 	// tooltip close	
@@ -197,7 +225,7 @@ $(function() {
 		
 		e.preventDefault();
 		
-		var paginateVars = $(this).prop('rel'),
+		var paginateVars = $(this).data('vars'),
 			album = paginateVars.split('|')[0],
 			page =  paginateVars.split('|')[1],
 			targetId = paginateVars.split('|')[2],
@@ -212,6 +240,7 @@ $(function() {
 });
 
 function loadGallery(folioGalleryDir,targetId,album,fullalbum,page) {                    
+	
 	$.ajax
 	({
 		type: 'POST',
@@ -226,6 +255,11 @@ function loadGallery(folioGalleryDir,targetId,album,fullalbum,page) {
 		success: function(msg)
 		{
 			$('#'+targetId).html(msg).hide().show();
+		},
+		error: function(jqXHR, textStatus, errorThrown)
+		{
+			alert("Error: jqXHR " + JSON.stringify(jqXHR) + " - textStatus " + JSON.stringify(textStatus) + " - errorThrown " + JSON.stringify(errorThrown));				
+			console.log($(jqXHR.responseText));
 		}
 	});
 	return false;

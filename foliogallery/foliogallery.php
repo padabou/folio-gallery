@@ -1,23 +1,18 @@
-<!--
-	folioGallery v4.1 - 2019-05-27
-	(c) 2019 Harry Ghazanian - foliopages.com/php-jquery-ajax-photo-gallery-no-database
-	This content is released under the http://www.opensource.org/licenses/mit-license.php MIT License.
--->
 <?php 
-include 'foliogallery/config.php';
+include 'config.php';
 $targetid = isset($_POST['targetid']) ? $_POST['targetid'] : ''; // id of gallery or album
 $page = isset($_REQUEST['page']) ? (int)$_REQUEST['page'] : ''; // page number if not inline view
 ?>
 
 <div class="fg">
 
-<?php 
+<?php
 if (empty($_REQUEST['album'])) // if no album requested, show all albums
-{		
-	$albums = array(); 
-	$albums = glob($mainFolder.'/*', GLOB_ONLYDIR); // scan only directories
+{	
+	$albums = []; 
+	$albums = glob($root.$albumsDir.'/*', GLOB_ONLYDIR); // scan only directories
 	$numAlbums = count($albums);
-	
+		
 	// sort the abums array	
 	if($sort_albums == 'newest')
 	{
@@ -38,7 +33,7 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 				 
 	if($numAlbums == 0) 
 	{
-		echo '<div class="titlebar"><p>There are no albums</p></div>';
+		echo '<div class="fgtitlebar"><p>There are no albums</p></div>';
 	}
 	else
 	{		  				
@@ -75,9 +70,9 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 		
 		if($show_titles)
 		{ ?>
-			<span class="fgtitle m5-left">Gallery, <?php echo $numAlbums; ?> albums</span>
+			<span class="fgtitle fgm5-left">Gallery, <?php echo $numAlbums; ?> albums</span>
 				
-			<div class="clear"></div>
+			<p class="fgclear"></p>
 		<?php
 		} ?>
 		
@@ -93,33 +88,47 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 			<div class="fgthumbwrap">
 			<div<?php if($inline_albums){ ?> class="fgthumbwrap-inner"<?php } ?>>
 				
-				<?php 
+				<?php				
 				$end = $start + $thumbs_per_page;						
 				for($i=$start; $i<$end; $i++)
 				{   									
 					if(isset($albums[$i]))
 					{
-						$album = basename($albums[$i]); // extract folder name from path
+						// create thumbs dir if it does not exist and make it writable
+						if(!is_dir($albums[$i].'/thumbs')) 
+						{						
+							if(is_writable($root.$albumsDir.'/'.$albums[$i]))
+							{
+								mkdir($root.$albumsDir.'/'.$albums[$i].'/thumbs');
+								chmod($root.$albumsDir.'/'.$albums[$i].'/thumbs', 0777);
+							} 
+							else
+							{
+								echo $albums[$i].'" directory is not writable.';
+							}		 	
+						}
 						
-						$thumb_pool = glob($mainFolder.'/'.$album.'/*.{'.$supported_extensions.'}', GLOB_BRACE);		
+						$album = basename($albums[$i]); // extract folder name from path
+																		
+						$thumb_pool = glob($root.$albumsDir.'/'.$album.'/*.{'.$image_ext_string.'}', GLOB_BRACE);		
 										
 						if (count($thumb_pool) == 0)
 						{ 
-							$thumb = '<img src="'.FG_DIR.'/images/'.$no_thumb.'" alt="">';
+							$thumb = '<img src="'.$fgDir.'/images/'.$no_thumb.'" alt="">';
 						}
 						else
 						{
 							$rand_thumb = ($random_thumbs ? $thumb_pool[array_rand($thumb_pool)] : $thumb_pool[0]); // display a random thumb or the 1st thumb	
 							$rand_thumb = basename($rand_thumb); // extract just the filename
-							$thumb = show_thumb($mainFolder.'/'.$album, $rand_thumb, $make_thumb_width);									
+							$thumb = show_thumb($root, $fgDir, $albumsDir, $album, 'thumbs/', $rand_thumb, $make_thumb_width);									
 						}						
 						?>
 										 
 						<div class="fgthumb">
 							
 							<div class="fgthumb-itself">
-								<a class="showAlb" rel="<?php echo $album; ?>" href="<?php echo $_SERVER['PHP_SELF']; ?>?album=<?php echo urlencode($album); ?>">
-									<?php echo $thumb; ?> 
+								<a class="showAlb" title="<?php echo $album; ?>" href="<?php echo $_SERVER['PHP_SELF']; ?>?album=<?php echo urlencode($album); ?>">
+									<?php echo $thumb; ?>
 								</a>
 							</div>
 							
@@ -127,10 +136,10 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 							if($album_captions)
 							{ ?>
 							
-								<div class="clear"></div>	
+								<p class="fgclear"></p>	
 								<div class="fgcaption">
 									<div class="fgcaption-inner">
-										<a class="showAlb" rel="<?php echo $album; ?>" href="<?php echo $_SERVER['PHP_SELF']; ?>?album=<?php echo urlencode($album); ?>">
+										<a class="showAlb" title="<?php echo $album; ?>" href="<?php echo $_SERVER['PHP_SELF']; ?>?album=<?php echo urlencode($album); ?>">
 											<?php echo $album; ?>
 											<span class="gradient-end"></span>
 										</a>	
@@ -153,7 +162,7 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 			<?php
 			if($show_pagination)
 			{ ?>
-				<div class="clear"></div>
+				<p class="fgclear"></p>
 	  
 				<div class="paginate-wrapper">
 					<?php 
@@ -167,15 +176,15 @@ if (empty($_REQUEST['album'])) // if no album requested, show all albums
 
     <?php
 	}
-
+	
 } 
 else //display photos in album 
 {
-
+		
 	$requested_album = sanitize($_REQUEST['album']); // xss prevention
 	
-	$user_path = realpath(dirname(__FILE__).'/'.$mainFolder.'/'.$requested_album); 
-	$safe_path = realpath(dirname(__FILE__).'/'.$mainFolder.'/');
+	$user_path = realpath(__DIR__.'/'.$albumsDir.'/'.$requested_album); 
+	$safe_path = realpath(__DIR__.'/'.$albumsDir.'/');
 		
 	// make sure $user_path is inside $safe_path
 	if (substr($user_path, 0, strlen($safe_path)) != $safe_path) 
@@ -183,10 +192,10 @@ else //display photos in album
 	   die ('Nothing to see here!');
 	}
 	
-	$album = $mainFolder.'/'.$requested_album;
+	$albumpath = $root.$albumsDir.'/'.$requested_album;
 	
-	$scan_files = array();
-	$scan_files = glob($album.'/*.{'.$supported_extensions.'}', GLOB_BRACE);
+	$scan_files = [];
+	$scan_files = glob($albumpath.'/*.*', GLOB_BRACE);
 	$numFiles = count($scan_files);
 				
 	// sort the files array	
@@ -207,44 +216,52 @@ else //display photos in album
 		sort($scan_files, SORT_FLAG_CASE);
 	}
 	
-	$files = array();
+	$files = [];
 	foreach($scan_files as $f) { $files[] = basename($f); }
 		
 	if($show_titles)
 	{	
 		if($fullAlbum==1)
 		{ ?>
-			<a class="fgtitle refresh m5-left" href="#">Index</a>
-			<span class="arrow-right"></span>
+			<a class="fgtitle fgrefresh fgm5-left" href="#">Index</a><span class="arrow-right"></span>
+			<span class="fgtitle"><?php echo $requested_album; ?>, <?php echo $numFiles; ?> items</span>
 		<?php 
-		} ?>
-		
-		<span class="title m5-left"><?php echo $requested_album; ?>, <?php echo $numFiles; ?> items</span>
-	    	   
-	   	<div class="clear"></div>
+		}
+		elseif($fgrefresh==1)
+		{ ?>
+			<a class="fgtitle fgm5-left" href="<?php echo $_SERVER['PHP_SELF']; ?>">Index</a><span class="arrow-right"></span>
+			<span class="fgtitle"><?php echo $requested_album; ?>, <?php echo $numFiles; ?> items</span>
+		<?php
+		} 
+		else
+		{ ?>
+			<span class="fgtitle fgm5-left"><?php echo $requested_album; ?>, <?php echo $numFiles; ?> items</span>
+	    <?php 
+		} ?>	   
+	   	<p class="fgclear"></p>
 	<?php
 	}
 	
 	if($numFiles == 0)
-	{
-		echo '<div class="clear"></div>No images in this album.';	
+	{ ?>
+		<p class="fgclear"></p>No images in this album.	
+	<?php
 	}
 	else	
-	{							 
-				
-		if(!is_dir($album.'/thumbs')) 
+	{							 				
+		// create thumbs dir if it does not exist and make it writable
+		if(!is_dir($albumpath.'/thumbs')) 
 		{						
-			if(is_writable($album))
+			if(is_writable($albumpath))
 			{
-				mkdir($album.'/thumbs');
-				chmod($album.'/thumbs', 0777);
-				//chown($album.'/thumbs', 'apache');
+				mkdir($albumpath.'/thumbs');
+				chmod($albumpath.'/thumbs', 0777);
 			} 
 			else
 			{
-				echo $album.'" directory is not writable.';
+				echo $albumpath.'" directory is not writable.';
 			}		 	
-		} 
+		}
 		
 		if($inline_thumbs)
 		{
@@ -280,7 +297,7 @@ else //display photos in album
 
 		<div class="fgthumbwrap-outer">
 		
-			<?php
+			<?php			
 			if($inline_thumbs)
 			{ ?>
 				<span class="fgleft"></span>
@@ -295,29 +312,28 @@ else //display photos in album
 				$end = $start + $thumbs_per_page;				 
 				for($i=$start; $i<$end; $i++)
 				{   									
-					if(isset($files[$i]) && is_file($album .'/'. $files[$i]))
+					if(isset($files[$i]) && is_file($albumpath.'/'.$files[$i]))
 					{   		    		
 						$file = $files[$i];
 						
-						$full_caption = (itemDescription($album, $file) ? itemDescription($album, $file) : $file); // image captions
-						$caption = encodeto($full_caption);	
-						
-						$thumb = show_thumb($album, $file, $make_thumb_width);				
+						$full_caption = (itemDescription($albumpath, $file) ? itemDescription($albumpath, $file) : $file); // image captions
+						$caption = encodeto($full_caption);		
+						$thumb = show_thumb($root, $fgDir, $albumsDir, $requested_album, 'thumbs/', $file, $make_thumb_width);			
 						?>	   
 					   
 						<div class="fgthumb">
 							
 							<div class="fgthumb-itself">
-								<?php echo url_start($album,$file).$thumb.$url_end; ?>
+								<?php echo url_start($albumpath,$file).$thumb.$url_end; ?>
 							</div>
 							
 							<?php
 							if($thumb_captions) 
 							{ ?>
-								<div class="clear"></div>
+								<p class="fgclear"></p>
 								<div class="fgcaption">
 									<div class="fgcaption-inner">
-										<?php echo $file; //echo url_start($album,$file).$caption.$url_end; ?>
+										<?php echo url_start($albumpath,$file).$caption.$url_end; ?>
 										<span class="gradient-end"></span>
 									</div>	
 								</div>
@@ -337,7 +353,7 @@ else //display photos in album
 			<?php
 			if($show_pagination)
 			{ ?>
-				<div class="clear"></div>
+				<p class="fgclear"></p>
 	  
 				<div class="paginate-wrapper">
 					<?php 
@@ -352,7 +368,7 @@ else //display photos in album
 		<?php 
 		if($album_descriptions)
 		{
-			echo (file_exists($album.'/descriptions.txt') ? '<div class="description-wrapper">'.encodeto(itemDescription($album)).'</div>' : ''); //display album description 
+			echo '<div class="description-wrapper">'.encodeto(itemDescription($albumpath)).'</div>'; //display album description 
 	  	}
 	  
 	} // end if numFiles not 0

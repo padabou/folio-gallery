@@ -1,15 +1,22 @@
 <?php
-// memory setting, if you get out of memory message during thumbnail creation, uncomment the following line, increase memory_limit size if required
-//ini_set('memory_limit', '256M');
+/***** comment out the following 3 lines to display php errors *****/
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
+
+/***** memory setting, if you get out of memory message during thumbnail creation, uncomment the following line to increase memory_limit size *****/ 
+// ini_set('memory_limit', '256M');
 
 /***** global settings *****/
-$mainFolder        = 'albums'; 	   // main folder that holds albums - this folder resides on root directory of your domain
-$no_thumb          = 'noimg.jpg';  // show this when no thumbnail exists 
-$extensions        = array('jpg','png','gif','mp3','mp4','pdf'); // allowed file extensions
-$make_thumb_width  = 240;         // max width of thumbnails when being created
-$show_titles 	   = TRUE;        // show/hide titles above gallery or albums
-$showExiff         = TRUE;        // TRUE will display exiff info of image in image view overlay info box - only for image files
-$thumbs_per_page   = '30';        // number of thumnbnails per page -- effective only if $inline_albums = FALSE or $inline_thumbs = FALSE 
+$rootDir  		   = '../';		     // root directory relative to $fgDir - this means 1 level up  
+$fgDir   		   = 'foliogallery'; // name of folder where foliogallery files are located
+$albumsDir         = 'albums';       // main folder that holds albums located on website's root
+$no_thumb          = 'noimg.jpg';    // show this when no thumbnail exists 
+$image_ext		   = ['jpg','jpeg','png','gif','JPG','JPEG','PNG','GIF','webp','WEBP'];
+$make_thumb_width  = 240;         	 // max width of thumbnails when being created
+$show_titles 	   = TRUE;        	 // show/hide titles above gallery or albums
+$showExiff         = TRUE;        	 // TRUE will display exiff info of image in image view overlay info box - only for image files
+$thumbs_per_page   = '30';        	 // number of thumnbnails per page -- effective only if $inline_albums = FALSE or $inline_thumbs = FALSE 
 
 /***** gallery settings *****/
 $inline_albums     = TRUE;        // TRUE will display album thumbs in the main gallery in one line scroller, FALSE will display all albums in gallery
@@ -25,17 +32,14 @@ $sort_files        = 'newest';    // newest: sort by modified date. oldest: sort
 
 /***** DO NOT CHANGE the following variables if you are not sure*****/
 
-define('FG_DIR', 'foliogallery'); // define foliogallery directory
+$root = (isset($root)) ? $root : $rootDir;
+$fgrefresh = (isset($indexit) && $indexit==1) ? 1 : 0;
 $show_pagination = FALSE;
-
-// accept both lowercase and uppercase extensions
-$accepted_lower = array_map('strtolower', $extensions); // convert extensions array to lowercase
-$accepted_upper = array_map('strtoupper', $extensions); // then uppercase
-$accepted_array = array_merge($accepted_lower, $accepted_upper); // merge above arrays into 1 array 
-$supported_extensions = implode(',',$accepted_array); // convert array to string 
 
 $url_end = '</a>';
 $fullAlbum = !empty($_REQUEST['fullalbum']) ? 1 : 0;
+
+$image_ext_string  = implode(',',$image_ext); // convert array to string
 
 /***** PHP functions *****/
 
@@ -54,64 +58,48 @@ function encodeto($string)
 }
 
 // function to show thumbnail for each image
-function show_thumb($folder, $file, $make_thumb_width) {
+function show_thumb($root, $fgDir, $albumsDir, $folder, $thumbs_dir, $file, $make_thumb_width, $create_thumb=1) {
 												
+	$image_ext = ['jpg','jpeg','png','gif','JPG','JPEG','PNG','GIF','webp','WEBP'];
+	
 	$html = '';
 	$file_parts = pathinfo($file);
 	$filename = $file_parts['filename'];
 	$ext = $file_parts['extension'];
 	
-	if (file_exists($folder.'/thumbs/'.$filename.'.'.$ext))
+	if (file_exists($root.$albumsDir.'/'.$folder.'/thumbs/'.$filename.'.'.$ext))
 	{
-		return '<img src="'.$folder.'/thumbs/'.$filename.'.'.$ext.'" alt="">';
+		return '<img src="'.$albumsDir.'/'.$folder.'/'.$thumbs_dir.$filename.'.'.$ext.'" alt="">';
 	}
 	else
-	{
-		switch($ext)
+	{									
+		if(in_array($ext,$image_ext))
 		{
-			case 'mp4':	
-			return '<img src="'.FG_DIR.'/images/video.jpg" alt="">';
-			break;
-			
-			case 'mp3':
-			return '<img src="'.FG_DIR.'/images/audio.jpg" alt="">';
-			break;
-			
-			case 'pdf': 
-			return '<img src="'.FG_DIR.'/images/pdf.jpg" alt="">'; 
-			break;
-		
-			default:
-			
-			if(!is_dir($folder.'/thumbs')) 
-			{						
-				if(is_writable($folder))
-				{
-					mkdir($folder.'/thumbs');
-					chmod($folder.'/thumbs', 0777);
-					//chown($album.'/thumbs', 'apache');
-					make_thumb($folder, $file, $folder.'/thumbs/'.$file, $make_thumb_width);	
-					return '<img src="'.$folder.'/thumbs/'.$filename.'.'.$ext.'" alt="">';
-				} 
-				else
-				{
-					return  $folder.' is not writable';
-				}
+			if($create_thumb==1)
+			{
+				make_thumb($root.$albumsDir.'/'.$folder, $file, $root.$albumsDir.'/'.$folder.'/thumbs/'.$file, $make_thumb_width);
 			}
-			else
-			{				
-				make_thumb($folder, $file, $folder.'/thumbs/'.$file, $make_thumb_width);	
-				return '<img src="'.$folder.'/thumbs/'.$filename.'.'.$ext.'" alt="">'; 
-			}
-		}	
-	}
+			return '<img src="'.$albumsDir.'/'.$folder.'/'.$thumbs_dir.$filename.'.'.$ext.'" alt="">';	
+		}
+		elseif(file_exists($root.$albumsDir.'/'.$folder.'/thumbs/'.$filename.'.jpg'))
+		{
+			return '<img src="'.$albumsDir.'/'.$folder.'/'.$thumbs_dir.$filename.'.jpg" alt="">';
+		}
+		elseif(file_exists('images/'.$ext.'.jpg'))
+		{
+			return '<img src="'.$fgDir.'/images/'.$ext.'.jpg" alt="">';
+		}
+		else
+		{
+			return '<img src="'.$fgDir.'/images/noimg.jpg" alt="">';
+		}
+	}	
 }
- 
+
 // function to create thumbnails from images
 function make_thumb($folder, $file, $dest, $thumb_width)
 {		
 	$file_parts = pathinfo($file);
-	//$filename = strtolower($file_parts['filename']);
 	$ext = strtolower($file_parts['extension']);
 	
 	if(isset($ext) && $ext != '')
@@ -121,7 +109,6 @@ function make_thumb($folder, $file, $dest, $thumb_width)
 			case "jpeg":		
 			case "jpg":
 			$source_image = imagecreatefromjpeg($folder.'/'.$file);
-			fixImageOrientation($folder.'/'.$file);
 			break;
 			
 			case "png":
@@ -130,6 +117,10 @@ function make_thumb($folder, $file, $dest, $thumb_width)
 			
 			case "gif":
 			$source_image = imagecreatefromgif($folder.'/'.$file);
+			break;
+			
+			case "webp":
+			$source_image = imagecreatefromwebp($folder.'/'.$file);
 			break;
 		}	
 		
@@ -170,12 +161,14 @@ function make_thumb($folder, $file, $dest, $thumb_width)
 				
 				case 'png': imagepng($virtual_image, $dest); 
 				break;
+				
+				case 'webp': imagewebp($virtual_image, $dest); 
+				break;
 
 			}
 			
 			imagedestroy($virtual_image); 
 			imagedestroy($source_image);
-			
 		}	
 		
 	}	
@@ -185,9 +178,9 @@ function make_thumb($folder, $file, $dest, $thumb_width)
 // get album and image descriptions
 function itemDescription($album, $file='')
 {
-	if(file_exists($album.'/descriptions.txt'))
+	if(file_exists($album.'/descriptions/descriptions.txt'))
 	{
-		$lines_array = file($album.'/descriptions.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES); 
+		$lines_array = file($album.'/descriptions/descriptions.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES); 
 		if($lines_array)
 		{
 			if($file == '')
@@ -225,47 +218,20 @@ function url_start($album, $file, $i=0, $class='showimage', $target='')
 	{
 		case "utube":
 		$video_id = $prefix[1];
-		$url_start = '<a href="http://www.youtube.com/embed/'.$video_id.'?rel=0&amp;wmode=transparent" rel="'.$album.'" rev="'.$file.'" tabindex="'.$i.'" title="" class="'.$class.'" '.$target.'>';
+		$url_start = '<a href="http://www.youtube.com/embed/'.$video_id.'?rel=0&amp;wmode=transparent" data-album="'.$album.'" data-file="'.$file.'" tabindex="'.$i.'" title="Open External Link" class="'.$class.'" '.$target.'>';
 		break;
 		
 		case "vimeo":
 		$video_id = $prefix[1];
-		$url_start = '<a href="http://player.vimeo.com/video/'.$video_id.'?rel=0&amp;wmode=transparent" rel="'.$album.'" rev="'.$file.'" tabindex="'.$i.'" title="" class="'.$class.'" '.$target.'>';
+		$url_start = '<a href="http://player.vimeo.com/video/'.$video_id.'?rel=0&amp;wmode=transparent" data-album="'.$album.'" data-file="'.$file.'" tabindex="'.$i.'" title="Open External Link" class="'.$class.'" '.$target.'>';
 		break;
 		
 		default:
-		$url_start = '<a href="'.$album.'/'.$file.'" rel="'.$album.'" rev="'.$file.'" tabindex="'.$i.'" title="" class="'.$class.'" '.$target.'>';
+		$url_start = '<a href="'.$album.'/'.$file.'" data-album="'.$album.'" data-albumname="'.basename($album).'" data-file="'.$file.'" tabindex="'.$i.'" title="'.$file.'" class="'.$class.'" '.$target.'>';
 		break;	
 	}
 	
 	return $url_start;
-	
-}
-
-function fixImageOrientation($filename) 
-{  	
-	//read EXIF header from file
-	$exif = @exif_read_data($filename);
-	 
-	if($exif) 
-	{ 
-		//fix the Orientation if EXIF data exists
-		if(!empty($exif['Orientation'])) 
-		{
-			switch($exif['Orientation']) 
-			{
-				case 3:
-				$createdImage = imagerotate($filename,180,0);
-				break;
-				case 6:
-				$createdImage = imagerotate($filename,-90,0);
-				break;
-				case 8:
-				$createdImage = imagerotate($filename,90,0);
-				break;
-			}
-		}
-	}   
 }
 
 // display pagination
@@ -287,7 +253,7 @@ function paginate_fggallery($numPages,$album,$targetid,$fullAlbum,$currentPage,$
 			$qs = http_build_query($_GET); // rebuild query string
 			$url = $page_url.'?'.$qs;
 		   
-		    $html .= '<a href="'.$url.'" class="'.$paginate_link_class.' prev" rel="'.$album.'|'.$prevPage.'|'.$targetid.'|'.$fullAlbum.'"><i class="material-icons">keyboard_arrow_left</i></a>';
+		    $html .= '<a href="'.$url.'" class="'.$paginate_link_class.' prev" data-vars="'.$album.'|'.$prevPage.'|'.$targetid.'|'.$fullAlbum.'"><i class="material-icons">keyboard_arrow_left</i></a>';
 	   }
 	   else
 	   {
@@ -304,7 +270,7 @@ function paginate_fggallery($numPages,$album,$targetid,$fullAlbum,$currentPage,$
 		   $url = $page_url.'?'.$qs;
 		   
 		   $class = ($p==$currentPage ? 'current-paginate' : 'paginate'); 
-		   $html .= '<a href="'.$url.'" class="'.$paginate_link_class.' '.$class.'" rel="'.$album.'|'.$p.'|'.$targetid.'|'.$fullAlbum.'">'.$p.'</a>';	  
+		   $html .= '<a href="'.$url.'" class="'.$paginate_link_class.' '.$class.'" data-vars="'.$album.'|'.$p.'|'.$targetid.'|'.$fullAlbum.'">'.$p.'</a>';	  
 	   }
 	   
 	   if ($currentPage != $numPages)
@@ -316,7 +282,7 @@ function paginate_fggallery($numPages,$album,$targetid,$fullAlbum,$currentPage,$
 			$qs = http_build_query($_GET); // rebuild query string
 			$url = $page_url.'?'.$qs;
 		   	
-			$html .= '<a href="'.$url.'" class="'.$paginate_link_class.' next" rel="'.$album.'|'.$nextPage.'|'.$targetid.'|'.$fullAlbum.'"><i class="material-icons">keyboard_arrow_right</i></a>';
+			$html .= '<a href="'.$url.'" class="'.$paginate_link_class.' next" data-vars="'.$album.'|'.$nextPage.'|'.$targetid.'|'.$fullAlbum.'"><i class="material-icons">keyboard_arrow_right</i></a>';
 	   }
 	   else
 	   {
@@ -326,6 +292,7 @@ function paginate_fggallery($numPages,$album,$targetid,$fullAlbum,$currentPage,$
 	}
 	
 	return $html;
-
 }
+
+
 ?>

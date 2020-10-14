@@ -1,3 +1,19 @@
+version 4.4
+- Added shortcode functionality
+- Fixed exif data display in foliogallery-img.php
+
+version 4.3
+- Moved foliogallery.php and foliogallery-img.php files to the script's main folder. These files don't reside on root any longer.
+- File types are no longer limited. All jpg, png and gif files will be displayed as images, other file types will be displayed as icons. mp3 and mp4 will be displayed in html5 player in the modal window.
+- Added .htaccess files to 'foliogallery' and 'albums' folders to prevent indexing. If you don't use Apache server remove these files and take other measures to prevent file/folder indexing. 
+- The script now checks for existence of 'exif' extension in the modal window, before trying to display exif info when $showExiff is TRUE.
+- Some variables have changed.
+- Cleaned up code and removed unnecessary code.
+
+version 4.2.1
+- Added toggle to info panel in image overlay
+- Minor improvements
+
 version 4.2
 - Added horizontal scrolling when displayed inline
 - Bug fixes

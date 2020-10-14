@@ -14,14 +14,29 @@ color:#222;
 }
 </style>
 <link type="text/css" rel="stylesheet" href="foliogallery/foliogallery.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="foliogallery/foliogallery.js"></script>
 </head>
 <body>
+<header>
+    <nav class="nav">
+        <div class="navbar" id="myTopnav">
+            <div class="dropdown">
+                <a href="/">Accueil</a>
+            </div>
 
-<br />
-<br />
+        </div>
+    </nav>
+</header>
+	<br />
+	<br />
+
+	<p>&nbsp;</p>
 	
+	<?php	
+	include 'foliogallery/foliogallery-functions.php';
+
+	$content_using_divs = '	
 	<!-- display list of folders in "albums" folder -->
 	<div id="folioGallery" class="folioGallery"></div>
 	
@@ -45,7 +60,36 @@ color:#222;
 	<div align="center">folioGallery - Installation and instructions @ <a href="http://foliopages.com/php-jquery-ajax-photo-gallery-no-database">FolioPages.com</a></div>
 	
 	<p>&nbsp;</p>
+	';
 	
+	$content = '	
+	
+	<!-- display all "albums" -->
+	[foliogallery]
+	
+	<p>&nbsp;</p>
+	
+	<!-- display list of folders in "albums" folder -->
+	[foliogallery=Videos]
+	
+	<p>&nbsp;</p>	
+	
+	<!-- display images located in "Scenery" subfolder -->
+	[foliogallery=Scenery]
+	
+	<p>&nbsp;</p>
+	<!-- display images located in "Loa Angeles" subfolder -->
+	[foliogallery=Los Angeles]
+	
+	';
+	echo foliogallery_shortcode($content); 
+	?>
+
+	<p>&nbsp;</p>
+				
+	<div align="center">folioGallery - Installation and instructions @ <a href="http://foliopages.com/php-jquery-ajax-photo-gallery-no-database">FolioPages.com</a></div>
+	
+	<p>&nbsp;</p>
 
 </body>
 </html>
