@@ -54,7 +54,7 @@ width:100%
 
 .fgthumb-itself a {color:#eee !important}
 
-.fgthumb-itself img {width:auto;max-height:120%;display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;background:#000;z-index:1}
+.fgthumb-itself img {width:auto;height:100%;display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;background:#000;z-index:1}
 
 .fgthumb:hover {box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 4px 0 rgba(0,0,0,0.25)}
 
@@ -79,8 +79,8 @@ color:#232323;
 height:36px;
 text-align:left;
 font-family:roboto_r;
-font-size:12px;
-line-height:18px;
+font-size:13px;
+line-height:19px;
 max-height:36px;
 z-index:1;
 white-space:normal;
@@ -97,7 +97,9 @@ right:0;
 bottom:0;
 width:36px;
 height:20px;
-background-image:linear-gradient(to right, transparent, white 75%);
+background-image: transparent;
+background-image: -webkit-linear-gradient(to right, transparent, white 75%);
+background-image: linear-gradient(to right, transparent, white 75%);
 z-index:2
 }	
 
@@ -130,16 +132,18 @@ display:none
 .fgleft:hover, 
 .fgright:hover{color:#111;background:#fff;cursor:pointer}
 
-.arrow-right{display:inline-block;position:relative;height:12px;line-height:12px;color:#000;font-size:14px;position:relative;vertical-align:1px;top:4px}
-.arrow-right:before{content:'\E409';font-family:'Material Icons'}
+.arrow-right{display:inline-block;position:relative;height:12px;line-height:1;color:#000;font-size:14px;position:relative;top:3px}
+.arrow-right:before{content:'\E409';font-family:'Material Icons';color:#000}
 
 #tooltipDiv{position:fixed;top:50%;left:50%;margin-left:-135px;margin-top:-110px;width:220px;overflow:hidden;display:none;padding:15px 25px 25px;background-color:#fff;font-size:13px;line-height:22px;word-wrap:break-word;word-wrap:pre-wrap;border-radius:5px;box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 4px 0 rgba(0,0,0,0.15);z-index:999}
 
-#tooltipDiv:after {content:'';}
+#tooltipDiv textarea{width:100%;height:110px;display:block;overflow:hidden;border:0}
+
+#tooltipDiv:after {content:''}
 
 #tooltipClose{display:block;width:24px;height:24px;position:absolute;top:10px;right:10px}
 #tooltipClose:before{content:'\E5CD';font-family:'Material Icons';font-size:24px}
-
+#tooltipClose:hover{cursor:pointer}
 #tooltipDiv .label-txt{font-size:14px;font-weight:700;color:#222;margin-bottom:5px}
 
 /*** image view overlay ***/
@@ -154,7 +158,7 @@ right:0;
 padding:0;
 font-size:12px;
 color:#575757;
-background-color:#111;
+background-color:#000;
 z-index:497;
 }
 
@@ -174,7 +178,11 @@ z-index:498;
 }
 a#fgOverlay-close:hover {color:#aaa;}
 
-#fgOverlay #leftCol {width:calc(100% - 390px);height:100%;display:block;overflow:hidden;position:absolute;left:0;top:0}
+#fgOverlay #leftCol {width:calc(100% - 390px);height:100%;display:block;overflow:hidden;position:absolute;left:0;top:0;background:#000;z-index:499;-webkit-transition:all .3s ease;-moz-transition:all .3s ease;-o-transition:all .3s ease;transition:all .3s ease}
+
+#fgOverlay #leftCol.leftColToggle{width:100%;height:auto}
+#fgOverlay #leftCol.leftColFW{width:100%;height:auto;-webkit-transition:none;-moz-transition:none;-o-transition:none;transition:none}
+
 #fgOverlay #leftCol #mainImage{display:block;position:relative;overflow:hidden;width:100%}	 
 
 #fgOverlay #infoBox {
@@ -188,7 +196,7 @@ max-width:350px;
 height:100%;
 padding-left:20px;
 padding-right:20px;
-background-color:#111;
+background-color:#000;
 font-family:roboto_r;
 font-weight:400;
 font-size:1em;
@@ -197,6 +205,8 @@ line-height:1.6em;
 text-align:left;
 z-index:498
 }
+
+#fgOverlay #infoBox.infoBoxToggle{display:none}
 
 #fgOverlay #infoBox .tablediv{display:table;position:relative;width:100%;height:100%}
 #fgOverlay #infoBox .celldiv{display:table-cell;vertical-align:middle}
@@ -240,8 +250,15 @@ margin:auto;
 padding:0;
 display:block;
 width:auto;
+max-width:100%;
 max-height:100%;
 z-index:498
+}
+
+#fgOverlay .imgFrame-wrap{
+overflow:hidden;
+padding:70px;
+border:1px solid #ccc
 }
 
 #fgOverlay .bottombar {
@@ -272,7 +289,7 @@ text-align:center;
 }
 
 .fg .refresh {cursor:pointer;}
-.fg .description-wrapper {padding-left:7px;padding-right:7px;font-size:13px;line-height:21px}
+.fg .description-wrapper {padding-left:7px;padding-right:7px;font-size:14px;line-height:21px}
 
 .exifname {font-weight:700;color:#ccc}
 
@@ -295,22 +312,35 @@ overflow:hidden;
 width:76px;
 height:64px;
 margin:2px;
-border:1px solid #444
+border:1px solid #444;
 }
 
-#fgOverlay #thumb-container .thumb.selected {border:1px solid #eee;}
-#fgOverlay #thumb-container .thumb img {width:auto;max-height:120%;display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0;} 
+#fgOverlay #thumb-container .thumb.selected {border:1px solid #eee}
+#fgOverlay #thumb-container .thumb img {width:auto;height:100%;display:block;margin:auto;position:absolute;top:0;bottom:0;left:0;right:0} 
 
 #fgOverlay a.btn{display:inline-block;padding:4px 14px 4px 10px;border:0;background:#333;font-size:12px;color:#aaa;border-radius:3px;text-decoration:none;margin-bottom:6px}
 #fgOverlay a.btn .material-icons{display:inline-flex;vertical-align:middle;padding-bottom:3px;font-size:16px}
 
 .fg .noimg {width:48px;height:48px;position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;background:#fff url(images/noimg.png) center center no-repeat}
 
-#fgOverlay .fgicon{width:36px;height:36px;line-height:36px;font-family:Material Icons;text-align:center;display:block;background-color:#111;text-decoration:none;color:#ccc;z-index:502}
+#fgOverlay .fgicon{width:36px;height:36px;line-height:36px;font-family:Material Icons;text-align:center;display:block;background-color:#000;text-decoration:none;color:#ccc;z-index:502}
 .fg .fgicon{font-family:Material Icons;text-align:center;display:inline-block;text-decoration:none;color:#555}
 
-#fgOverlay .fgicon.icon-close{position:absolute;top:5px;right:5px;background:transparent}
-#fgOverlay .fgicon.icon-close:before {content:'\E5CD';font-family:'Material Icons';font-size:36px}
+#fgOverlay .fgicon.icon-close,
+#fgOverlay .fgicon.icon-drawer,
+#fgOverlay .fgicon.icon-share,
+#fgOverlay .fgicon.icon-open{position:absolute;top:1px;right:0;width:40px;height:34px;line-height:34px;background:#333}
+
+#fgOverlay .fgicon.icon-close:before{content:'\E5CD';font-family:'Material Icons';font-size:28px}
+
+#fgOverlay .fgicon.icon-drawer{right:41px}
+#fgOverlay .fgicon.icon-drawer:before{content:'\E8C4';font-family:'Material Icons';font-size:22px}
+
+#fgOverlay .fgicon.icon-share{right:82px}
+#fgOverlay .fgicon.icon-share:before{content:'\E80D';font-family:'Material Icons';font-size:22px;}
+
+#fgOverlay .fgicon.icon-open{right:123px}
+#fgOverlay .fgicon.icon-open:before{content:'\E89E';font-family:'Material Icons';font-size:24px}
 
 #fgOverlay .fgicon.icon-left,
 #fgOverlay .fgicon.icon-right{width:34px;height:40px;line-height:40px;font-size:21px;position:relative;float:left;background:transparent}
@@ -333,9 +363,10 @@ border:1px solid #444
 .fg img {border:0;}
 .fg .clear {clear:both;}
 
-.clear {height:0;clear:both;}
-.m5-left{margin-left:5px;}
-.fgtitle {font-family:roboto_c;font-size:14px;}
+.fgclear,
+p.fgclear {height:0;clear:both;padding:0;margin:0}
+.fgm5-left{margin-left:5px;}
+.fgtitle {font-family:roboto_r;font-size:14px;}
 
 #fgOverlay .fgmainspinner{
 display:hide;
@@ -462,16 +493,18 @@ background-color:#85b3a6
 }
 
 @font-face {
-font-family: 'roboto_c';
-src: url(fonts/roboto/robotocondensed-regular-webfont.woff) format('woff');
-font-weight: normal;
-font-style: normal
+font-family: roboto_r;
+src: local(Roboto-Regular), 
+url(fonts/roboto/Roboto-Regular.woff2) format("woff2"),
+url(fonts/roboto/Roboto-Regular.woff) format("woff");
+font-weight:400;font-style:normal;font-display:swap
 }
 @font-face {
-font-family: 'roboto_r';
-src: url(fonts/roboto/Roboto-Regular-webfont.woff) format('woff'); 
-font-weight: normal;
-font-style: normal
+font-family: roboto_c;
+src: local(Roboto-Condensed), 
+url(fonts/roboto/Roboto-Condensed.woff2) format("woff2"),
+url(fonts/roboto/Roboto-Condensed.woff) format("woff");
+font-weight:400;font-style:normal;font-display:swap
 }
 @font-face {font-family:'Material Icons'; 
 src: local('Material Icons'),

@@ -4,9 +4,7 @@ services:
     "build":
       "context": "./"
       "dockerfile": "Dockerfile-apache"
-    container_name: php_web
-    depends_on:
-      - bdd
+    container_name: php_web_folio
     volumes:
       - .:/var/www/html/
     ports:

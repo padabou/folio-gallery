@@ -12,9 +12,19 @@ padding:0;
 font:13px arial, Helvetica, sans-serif;
 color:#222;
 }
+.top-container{
+display:block;
+position:relative;
+width:94%;
+padding:3% 3% 30px 3%;
+max-width:560px;
+margin:0 auto;
+font-size:16px;
+line-height:28px
+}
 </style>
 <link type="text/css" rel="stylesheet" href="foliogallery/foliogallery.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="foliogallery/foliogallery.js"></script>
 </head>
 <body>
@@ -22,7 +32,16 @@ color:#222;
 <br />
 <br />
 
-<?php include 'foliogallery.php'; ?>
+<div class="top-container">
+	If you want to embed the gallery in your php page using php include, you must set the $root and $indexit variables before including the gallery file.
+	<br>
+	See the source code of this page.
+</div>
+<?php 
+$root = '';
+$indexit = 1;
+include 'foliogallery/foliogallery.php'; 
+?>
 
 <br />
 <br />
